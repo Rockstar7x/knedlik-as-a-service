@@ -1,7 +1,8 @@
 import { DayPlan, type Meal } from "@/components/day-plan";
 import { MacroBar } from "@/components/macro-bar";
 import { MealCard } from "@/components/meal-card";
-import { ShoppingListItem } from "@/components/shopping-list-item";
+import { ShoppingList } from "@/components/shopping-list";
+import { mockShoppingList } from "@/lib/mock/shopping-list";
 
 const meals: Meal[] = [
   {
@@ -59,19 +60,8 @@ export default function DesignPage() {
 
       <section className="grid gap-4">
         <h2 className="text-xl font-semibold">Shopping list</h2>
-        <ul className="divide-y">
-          <li>
-            <ShoppingListItem
-              name="Smetana ke šlehání"
-              quantity={250}
-              unit="ml"
-              defaultChecked
-            />
-          </li>
-          <li>
-            <ShoppingListItem name="Hovězí svíčková" quantity={500} unit="g" />
-          </li>
-        </ul>
+        <ShoppingList items={mockShoppingList.slice(0, 4)} />
+        <ShoppingList items={[]} />
       </section>
 
       <section className="grid gap-6">
