@@ -16,9 +16,10 @@ export type Meal = {
 type DayPlanProps = {
   dayName: string;
   meals: Meal[];
+  planId?: string;
 };
 
-export function DayPlan({ dayName, meals }: DayPlanProps) {
+export function DayPlan({ dayName, meals, planId }: DayPlanProps) {
   if (meals.length === 0) {
     return (
       <section className="grid gap-2">
@@ -51,6 +52,7 @@ export function DayPlan({ dayName, meals }: DayPlanProps) {
             preparationTime={meal.preparationTime}
             servings={meal.servings}
             kcal={meal.kcal}
+            href={planId ? `/plans/${planId}/meals/${meal.id}` : undefined}
           />
         ))}
       </div>

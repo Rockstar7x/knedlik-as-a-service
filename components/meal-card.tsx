@@ -1,11 +1,12 @@
+import { ClockIcon } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
-import { Badge } from "./ui/badge";
-import { ClockIcon } from "lucide-react";
 
 type MealCardProps = {
   name: string;
@@ -13,6 +14,7 @@ type MealCardProps = {
   preparationTime: number;
   servings?: number;
   kcal: number;
+  href?: string;
 };
 
 export function MealCard({
@@ -21,11 +23,12 @@ export function MealCard({
   preparationTime,
   servings,
   kcal,
+  href,
 }: MealCardProps) {
-  return (
-    <Card>
+  const card = (
+    <Card className="h-full transition-shadow group-hover:ring-primary/50">
       <CardHeader>
-        <CardTitle>{name}</CardTitle>
+        <CardTitle className="group-hover:text-primary">{name}</CardTitle>
         {category && <Badge variant="secondary">{category}</Badge>}
         <CardDescription>
           <span>
@@ -36,5 +39,18 @@ export function MealCard({
         </CardDescription>
       </CardHeader>
     </Card>
+  );
+
+  if (!href) {
+    return card;
+  }
+
+  return (
+    <Link
+      href={href}
+      className="group rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+    >
+      {card}
+    </Link>
   );
 }
