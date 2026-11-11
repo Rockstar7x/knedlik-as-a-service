@@ -1,4 +1,4 @@
-import { mockWeek } from "@/lib/mock/week-plan";
+import { mockPlan } from "@/lib/mock/week-plan";
 
 export type Ingredient = {
   name: string;
@@ -104,11 +104,9 @@ export const mockRecipes: Record<string, RecipeDetail> = {
 };
 
 export function findMockMeal(mealId: string) {
-  for (const day of mockWeek) {
-    const meal = day.meals.find((m) => m.id === mealId);
-    if (meal) {
-      return { meal, dayName: day.dayName, recipe: mockRecipes[mealId] };
-    }
+  const meal = mockPlan.meals.find((m) => m.id === mealId);
+  if (!meal) {
+    return undefined;
   }
-  return undefined;
+  return { meal, recipe: mockRecipes[mealId] };
 }

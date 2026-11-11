@@ -1,12 +1,15 @@
-import { DayPlan, type Meal } from "@/components/day-plan";
+import { DayPlan } from "@/components/day-plan";
 import { MacroBar } from "@/components/macro-bar";
 import { MealCard } from "@/components/meal-card";
 import { ShoppingList } from "@/components/shopping-list";
+import { type Meal } from "@/lib/meals";
 import { mockShoppingList } from "@/lib/mock/shopping-list";
 
 const meals: Meal[] = [
   {
     id: "1",
+    date: "2026-11-16",
+    mealType: "LUNCH",
     name: "Svíčková na smetaně",
     category: "Hlavní jídlo",
     preparationTime: 30,
@@ -18,6 +21,8 @@ const meals: Meal[] = [
   },
   {
     id: "2",
+    date: "2026-11-16",
+    mealType: "DINNER",
     name: "Vepřo knedlo zelo",
     category: "Hlavní jídlo",
     preparationTime: 45,
@@ -38,6 +43,7 @@ export default function DesignPage() {
         <h2 className="text-xl font-semibold">Meal cards</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <MealCard
+            mealType="LUNCH"
             name="Svíčková na smetaně"
             category="Hlavní jídlo"
             preparationTime={30}
@@ -66,8 +72,8 @@ export default function DesignPage() {
 
       <section className="grid gap-6">
         <h2 className="text-xl font-semibold">Day plan</h2>
-        <DayPlan dayName="Pondělí" meals={meals} />
-        <DayPlan dayName="Úterý" meals={[]} />
+        <DayPlan date="2026-11-16" meals={meals} />
+        <DayPlan date="2026-11-17" meals={[]} />
       </section>
     </main>
   );

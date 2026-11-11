@@ -4,7 +4,8 @@ import { Suspense } from "react";
 import { DayPlan } from "@/components/day-plan";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { mockWeek } from "@/lib/mock/week-plan";
+import { groupMealsByDay } from "@/lib/meals";
+import { mockPlan } from "@/lib/mock/week-plan";
 
 export const metadata: Metadata = {
   title: "Meal plan",
@@ -16,6 +17,7 @@ async function WeekPlan({
   params: PageProps<"/plans/[id]">["params"];
 }) {
   const { id } = await params;
+  const days = groupMealsByDay(mockPlan.weekStart, mockPlan.meals);
 
   return (
     <>
@@ -41,13 +43,8 @@ async function WeekPlan({
         </div>
       </div>
 
-      {mockWeek.map((day) => (
-        <DayPlan
-          key={day.dayName}
-          dayName={day.dayName}
-          meals={day.meals}
-          planId={id}
-        />
+      {days.map((day) => (
+        <DayPlan key={day.date} date={day.date} meals={day.meals} planId={id} />
       ))}
     </>
   );

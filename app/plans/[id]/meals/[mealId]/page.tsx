@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MEAL_TYPE_LABELS } from "@/lib/meals";
 import { findMockMeal } from "@/lib/mock/recipes";
+import { formatDay } from "@/lib/week";
 
 type RecipePageProps = PageProps<"/plans/[id]/meals/[mealId]">;
 
@@ -28,7 +30,7 @@ async function Recipe({ params }: { params: RecipePageProps["params"] }) {
     notFound();
   }
 
-  const { meal, dayName, recipe } = found;
+  const { meal, recipe } = found;
 
   return (
     <>
@@ -42,7 +44,9 @@ async function Recipe({ params }: { params: RecipePageProps["params"] }) {
         <Badge variant="secondary">{meal.category}</Badge>
         <h1 className="text-2xl font-semibold">{meal.name}</h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          <span>{dayName}</span>
+          <span>
+            {MEAL_TYPE_LABELS[meal.mealType]} · {formatDay(meal.date)}
+          </span>
           <span className="flex items-center gap-1.5">
             <ClockIcon className="size-4" />
             {meal.preparationTime} min

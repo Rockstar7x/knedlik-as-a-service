@@ -7,8 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { MEAL_TYPE_LABELS, type MealType } from "@/lib/meals";
 
 type MealCardProps = {
+  mealType?: MealType;
   name: string;
   category?: string;
   preparationTime: number;
@@ -18,6 +20,7 @@ type MealCardProps = {
 };
 
 export function MealCard({
+  mealType,
   name,
   category,
   preparationTime,
@@ -28,6 +31,11 @@ export function MealCard({
   const card = (
     <Card className="h-full transition-shadow group-hover:ring-primary/50">
       <CardHeader>
+        {mealType && (
+          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            {MEAL_TYPE_LABELS[mealType]}
+          </p>
+        )}
         <CardTitle className="group-hover:text-primary">{name}</CardTitle>
         {category && <Badge variant="secondary">{category}</Badge>}
         <CardDescription>

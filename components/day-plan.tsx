@@ -1,25 +1,17 @@
 import { MacroBar } from "@/components/macro-bar";
 import { MealCard } from "@/components/meal-card";
-
-export type Meal = {
-  id: string;
-  name: string;
-  category: string;
-  preparationTime: number;
-  servings: number;
-  kcal: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-};
+import { type Meal } from "@/lib/meals";
+import { formatDay } from "@/lib/week";
 
 type DayPlanProps = {
-  dayName: string;
+  date: string;
   meals: Meal[];
   planId?: string;
 };
 
-export function DayPlan({ dayName, meals, planId }: DayPlanProps) {
+export function DayPlan({ date, meals, planId }: DayPlanProps) {
+  const dayName = formatDay(date);
+
   if (meals.length === 0) {
     return (
       <section className="grid gap-2">
@@ -47,6 +39,7 @@ export function DayPlan({ dayName, meals, planId }: DayPlanProps) {
         {meals.map((meal) => (
           <MealCard
             key={meal.id}
+            mealType={meal.mealType}
             name={meal.name}
             category={meal.category}
             preparationTime={meal.preparationTime}
