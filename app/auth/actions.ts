@@ -48,7 +48,8 @@ export async function signUp(
       // Configured URL rather than the request's Origin header, so the link
       // always points at our own site. Must be allowed in Supabase Auth's
       // redirect URL list.
-      emailRedirectTo: `${publicEnv().NEXT_PUBLIC_SITE_URL}/auth/confirm?next=/`,
+      // New users go straight to onboarding after confirming their email.
+      emailRedirectTo: `${publicEnv().NEXT_PUBLIC_SITE_URL}/auth/confirm?next=/onboarding`,
     },
   });
 
@@ -58,7 +59,7 @@ export async function signUp(
 
   // If "Confirm email" is disabled in Supabase, the user is signed in already.
   if (data.session) {
-    redirect("/");
+    redirect("/onboarding");
   }
   redirect("/auth/sign-up-success");
 }
