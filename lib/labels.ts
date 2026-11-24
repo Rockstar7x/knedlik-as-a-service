@@ -1,7 +1,8 @@
 import type { Enums } from "@/lib/supabase/database.types";
 
-// Human-readable labels for the preference enums. Typed as Record<Enum, string>,
-// so adding a value to a database enum is a type error here until it gets a label.
+// Human-readable labels for the database enums, the only place they are
+// defined. Typed as Record<Enum, string>, so adding a value to a database enum
+// is a type error here until it gets a label.
 
 export const MEAL_TYPE_LABELS: Record<Enums<"meal_type">, string> = {
   BREAKFAST: "Breakfast",
@@ -11,10 +12,13 @@ export const MEAL_TYPE_LABELS: Record<Enums<"meal_type">, string> = {
 
 export const CATEGORY_LABELS: Record<Enums<"category">, string> = {
   QUICK: "Quick meals",
+  LOW_CALORIE: "Low-calorie",
+  FAMILY_CLASSIC: "Family classics",
+  HEALTHY_COMFORT: "Healthy comfort food",
+  FAKEAWAY: "Fakeaway",
+  EASY_TO_DIGEST: "Easy to digest",
   HIGH_PROTEIN: "High-protein",
   CZECH_CLASSIC: "Czech classics",
-  VEGETARIAN: "Vegetarian",
-  BUDGET: "Budget-friendly",
 };
 
 export const APPLIANCE_LABELS: Record<Enums<"appliance">, string> = {
@@ -22,7 +26,6 @@ export const APPLIANCE_LABELS: Record<Enums<"appliance">, string> = {
   OVEN: "Oven",
   MICROWAVE: "Microwave",
   AIR_FRYER: "Air fryer",
-  BLENDER: "Blender",
 };
 
 export const DIET_LABELS: Record<Enums<"diet">, string> = {
