@@ -71,7 +71,7 @@ Team project for the course PV247 (Modern Development of User Interfaces) at FI 
 - React 19, TypeScript
 - Tailwind CSS v4
 - [shadcn/ui](https://ui.shadcn.com) on top of Base UI
-- Database and authentication: _TBD (Fiwell)_
+- [Supabase](https://supabase.com): Postgres with Row Level Security, Auth (e-mail and password)
 - AI generation: _TBD_
 - Hosted on [Vercel](https://vercel.com)
 
@@ -81,6 +81,7 @@ Team project for the course PV247 (Modern Development of User Interfaces) at FI 
 
 - Node.js in the version from `.nvmrc` (with nvm: `nvm use`)
 - npm
+- Access to the team's Supabase project (ask a teammate to invite you)
 
 ### Install and run
 
@@ -88,6 +89,7 @@ Team project for the course PV247 (Modern Development of User Interfaces) at FI 
 git clone https://github.com/Rockstar7x/knedlik-as-a-service.git
 cd knedlik-as-a-service
 npm ci
+cp .env.example .env.local   # then fill in the values, see below
 npm run dev
 ```
 
@@ -95,7 +97,49 @@ The app runs at http://localhost:3000.
 
 ### Environment variables
 
-_TBD: will be added together with the database and authentication. Copy `.env.example` to `.env.local` and fill in the values. Never commit `.env.local`._
+Copy `.env.example` to `.env.local` and fill in the values from the Supabase dashboard (**Project Settings → API Keys**). Never commit `.env.local`.
+
+| Variable                               | Required           | Description                                                                         |
+| -------------------------------------- | ------------------ | ----------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | yes                | Project URL, `https://<project-ref>.supabase.co`                                    |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes                | Publishable key (`sb_publishable_…`). Safe in the browser, RLS protects the data.   |
+| `SUPABASE_SECRET_KEY`                  | only for `db:seed` | Secret key (`sb_secret_…`). Bypasses RLS. Server-only, never prefix `NEXT_PUBLIC_`. |
+| `NEXT_PUBLIC_SITE_URL`                 | no                 | Base URL for the e-mail confirmation link. Defaults to `http://localhost:3000`.     |
+
+The public variables are validated at runtime in `lib/env.ts`.
+
+## Database
+
+The schema lives in `supabase/migrations/` and is applied to the Supabase project with the Supabase CLI (a dev dependency, run it with `npx supabase`). Link your checkout to the project once:
+
+```bash
+npx supabase login
+npx supabase link --project-ref <project-ref>
+```
+
+### Data model
+
+| Table              | Contents                                                                                                                                                                          |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `profiles`         | One row per user, created by a trigger on sign-up                                                                                                                                 |
+| `preferences`      | The user's current preferences: meals of the day, categories, appliances, servings, diet, allergens, disliked ingredients, cooking time, daily kcal, cooking skill, weekly budget |
+| `meal_plans`       | One plan per user and week (`week_start` is a Monday), with a snapshot of the preferences it was generated with                                                                   |
+| `meals`            | Meals of a plan by date and meal of the day, with category, preparation time, kcal and macros per serving                                                                         |
+| `meal_ingredients` | Ingredients of a meal, quantities for all servings of the plan                                                                                                                    |
+| `meal_steps`       | Numbered steps of a meal                                                                                                                                                          |
+| `shopping_items`   | Merged ingredients of a plan (one row per name and unit) with a checked flag                                                                                                      |
+
+Every table has RLS enabled: a user can read and write only their own rows. The plan keeps its own copy of all preference columns because changing the profile must not affect existing plans, and replacing a meal must use the preferences the plan was generated with.
+
+### Changing the schema
+
+1. Add a new migration with `npx supabase migration new <name>` and write the SQL. Never edit a migration that has already been applied.
+2. Apply it with `npm run db:push`.
+3. Regenerate the TypeScript types with `npm run db:types` and commit them together with the migration.
+
+### Demo data
+
+`npm run db:seed` creates two confirmed demo users with preferences and a meal plan for the current week: `joe@knedlik.test` and `jane@knedlik.test`, both with the password `knedlik123`. Running it again deletes and recreates only these demo users. It needs `SUPABASE_SECRET_KEY` in `.env.local`.
 
 ## Scripts
 
@@ -108,6 +152,9 @@ _TBD: will be added together with the database and authentication. Copy `.env.ex
 | `npm run format`       | Format all files with Prettier               |
 | `npm run format:check` | Check formatting (used in CI)                |
 | `npm run typecheck`    | Generate route types and run the TS compiler |
+| `npm run db:push`      | Apply new migrations to the Supabase project |
+| `npm run db:types`     | Regenerate `lib/supabase/database.types.ts`  |
+| `npm run db:seed`      | Recreate the demo users and their data       |
 
 ## Workflow
 
@@ -160,12 +207,23 @@ Dynamic pages (e.g. recipe detail) use `generateMetadata` so the title contains 
 - The project uses **Base UI**, not Radix. When copying examples from the shadcn docs, make sure they are for Base UI.
 - Use `cn()` from `lib/utils.ts` to combine Tailwind classes.
 
+### Data access
+
+- Pages and Server Actions read and write data only through functions in `lib/data/`, never with the Supabase client directly.
+- Every such function checks the user with `requireUser()` from `lib/auth/dal.ts` and filters by their id explicitly, even though RLS does the same. If one of them is ever wrong, the other still protects the data.
+- They return plain objects with camelCase fields, not database rows, so components do not depend on column names. Types shared with client components live in `lib/meals.ts`.
+- A function that loads one record returns `null` when it does not exist or belongs to someone else. The page then calls `notFound()`.
+
 ## Project structure
 
 ```
-app/              routes, layouts and pages
-components/ui/    shadcn/ui components
-components/       app-specific components
-lib/              utilities and shared logic
-_
+app/                   routes, layouts and pages
+components/ui/         shadcn/ui components
+components/            app-specific components
+lib/                   utilities and shared logic
+lib/auth/              who the current user is (data access layer)
+lib/data/              database queries, return types the UI uses
+lib/supabase/          Supabase clients and generated database types
+scripts/               seed script
+supabase/migrations/   database schema
 ```
