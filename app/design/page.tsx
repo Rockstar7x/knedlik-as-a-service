@@ -2,8 +2,8 @@ import { DayPlan } from "@/components/day-plan";
 import { MacroBar } from "@/components/macro-bar";
 import { MealCard } from "@/components/meal-card";
 import { ShoppingList } from "@/components/shopping-list";
-import { type Meal } from "@/lib/meals";
-import { mockShoppingList } from "@/lib/mock/shopping-list";
+import { CATEGORY_LABELS } from "@/lib/labels";
+import { type Meal, type ShoppingItem } from "@/lib/meals";
 
 const meals: Meal[] = [
   {
@@ -11,7 +11,7 @@ const meals: Meal[] = [
     date: "2026-11-16",
     mealType: "LUNCH",
     name: "Svíčková na smetaně",
-    category: "Hlavní jídlo",
+    category: "CZECH_CLASSIC",
     preparationTime: 30,
     servings: 4,
     kcal: 500,
@@ -24,7 +24,7 @@ const meals: Meal[] = [
     date: "2026-11-16",
     mealType: "DINNER",
     name: "Vepřo knedlo zelo",
-    category: "Hlavní jídlo",
+    category: "FAMILY_CLASSIC",
     preparationTime: 45,
     servings: 4,
     kcal: 600,
@@ -32,6 +32,13 @@ const meals: Meal[] = [
     carbs: 60,
     fat: 25,
   },
+];
+
+const shoppingItems: ShoppingItem[] = [
+  { id: "1", name: "Eggs", quantity: 10, unit: "PCS", checked: true },
+  { id: "2", name: "Potatoes", quantity: 1500, unit: "G", checked: false },
+  { id: "3", name: "Milk", quantity: 500, unit: "ML", checked: false },
+  { id: "4", name: "Butter", quantity: 12.5, unit: "G", checked: false },
 ];
 
 export default function DesignPage() {
@@ -45,13 +52,13 @@ export default function DesignPage() {
           <MealCard
             mealType="LUNCH"
             name="Svíčková na smetaně"
-            category="Hlavní jídlo"
+            category={CATEGORY_LABELS.CZECH_CLASSIC}
             preparationTime={30}
             kcal={500}
           />
           <MealCard
             name="Vepřo knedlo zelo"
-            category="Hlavní jídlo"
+            category={CATEGORY_LABELS.FAMILY_CLASSIC}
             preparationTime={45}
             kcal={600}
             servings={4}
@@ -66,7 +73,7 @@ export default function DesignPage() {
 
       <section className="grid gap-4">
         <h2 className="text-xl font-semibold">Shopping list</h2>
-        <ShoppingList items={mockShoppingList.slice(0, 4)} />
+        <ShoppingList items={shoppingItems} />
         <ShoppingList items={[]} />
       </section>
 

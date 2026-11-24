@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ShoppingListItem } from "@/components/shopping-list-item";
-import { type ShoppingItem } from "@/lib/mock/shopping-list";
+import { type ShoppingItem } from "@/lib/meals";
 
 type ShoppingListProps = {
   items: ShoppingItem[];

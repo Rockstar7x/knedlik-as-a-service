@@ -2,12 +2,13 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { formatQuantity, type Unit } from "@/lib/meals";
 import { cn } from "@/lib/utils";
 
 type ShoppingListItemProps = {
   name: string;
   quantity: number;
-  unit: string;
+  unit: Unit;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
 };
@@ -41,7 +42,7 @@ export function ShoppingListItem({
           checked && "text-muted-foreground",
         )}
       >
-        {quantity} {unit}
+        {formatQuantity(quantity, unit)}
       </span>
     </div>
   );

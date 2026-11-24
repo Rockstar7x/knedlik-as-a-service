@@ -54,3 +54,9 @@ export const COOKING_SKILL_LABELS: Record<Enums<"cooking_skill">, string> = {
   INTERMEDIATE: "Intermediate",
   ADVANCED: "Advanced",
 };
+
+export const UNIT_LABELS: Record<Enums<"unit">, string> = {
+  G: "g",
+  ML: "ml",
+  PCS: "pcs",
+};

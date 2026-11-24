@@ -1,23 +1,35 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DayPlan } from "@/components/day-plan";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getMyMealPlan } from "@/lib/data/meal-plans";
 import { groupMealsByDay } from "@/lib/meals";
-import { mockPlan } from "@/lib/mock/week-plan";
+import { formatWeek } from "@/lib/week";
 
-export const metadata: Metadata = {
-  title: "Meal plan",
-};
+type MealPlanPageProps = PageProps<"/plans/[id]">;
 
-async function WeekPlan({
+export async function generateMetadata({
   params,
-}: {
-  params: PageProps<"/plans/[id]">["params"];
-}) {
+}: MealPlanPageProps): Promise<Metadata> {
   const { id } = await params;
-  const days = groupMealsByDay(mockPlan.weekStart, mockPlan.meals);
+  const plan = await getMyMealPlan(id);
+  return {
+    title: plan ? `Meal plan ${formatWeek(plan.weekStart)}` : "Meal plan",
+  };
+}
+
+async function WeekPlan({ params }: { params: MealPlanPageProps["params"] }) {
+  const { id } = await params;
+  const plan = await getMyMealPlan(id);
+
+  if (!plan) {
+    notFound();
+  }
+
+  const days = groupMealsByDay(plan.weekStart, plan.meals);
 
   return (
     <>
@@ -33,9 +45,14 @@ async function WeekPlan({
           ← All plans
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold">Meal plan</h1>
+          <div className="grid gap-1">
+            <h1 className="text-2xl font-semibold">Meal plan</h1>
+            <p className="text-sm text-muted-foreground">
+              {formatWeek(plan.weekStart)}
+            </p>
+          </div>
           <Link
-            href={`/plans/${id}/shopping-list`}
+            href={`/plans/${plan.id}/shopping-list`}
             className={buttonVariants({ variant: "outline" })}
           >
             Shopping list
@@ -44,7 +61,12 @@ async function WeekPlan({
       </div>
 
       {days.map((day) => (
-        <DayPlan key={day.date} date={day.date} meals={day.meals} planId={id} />
+        <DayPlan
+          key={day.date}
+          date={day.date}
+          meals={day.meals}
+          planId={plan.id}
+        />
       ))}
     </>
   );
@@ -63,7 +85,7 @@ function WeekPlanSkeleton() {
   );
 }
 
-export default function MealPlanPage({ params }: PageProps<"/plans/[id]">) {
+export default function MealPlanPage({ params }: MealPlanPageProps) {
   return (
     <main className="mx-auto grid w-full max-w-4xl gap-8 px-6 pb-6">
       <Suspense fallback={<WeekPlanSkeleton />}>
