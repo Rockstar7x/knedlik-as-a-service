@@ -12,7 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.18";
   };
-
   public: {
     Tables: {
       meal_ingredients: {
