@@ -34,15 +34,15 @@ export function MacroBar({ protein, carbs, fat }: MacroBarProps) {
       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-chart-1" />
-          Protein {protein} g
+          Protein {Math.round(protein)} g
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-chart-2" />
-          Carbs {carbs} g
+          Carbs {Math.round(carbs)} g
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-chart-3" />
-          Fat {fat} g
+          Fat {Math.round(fat)} g
         </span>
       </div>
     </div>
