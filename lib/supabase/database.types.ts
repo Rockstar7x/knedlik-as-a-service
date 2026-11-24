@@ -159,28 +159,49 @@ export type Database = {
       };
       preferences: {
         Row: {
+          allergens: Database["public"]["Enums"]["allergen"][];
           appliances: Database["public"]["Enums"]["appliance"][];
           categories: Database["public"]["Enums"]["category"][];
+          cooking_skill: Database["public"]["Enums"]["cooking_skill"];
+          daily_kcal_target: number | null;
+          diet: Database["public"]["Enums"]["diet"];
+          disliked_ingredients: string[];
+          max_prep_minutes: number | null;
           meal_types: Database["public"]["Enums"]["meal_type"][];
           servings: number;
           updated_at: string;
           user_id: string;
+          weekly_budget_czk: number | null;
         };
         Insert: {
+          allergens?: Database["public"]["Enums"]["allergen"][];
           appliances?: Database["public"]["Enums"]["appliance"][];
           categories?: Database["public"]["Enums"]["category"][];
+          cooking_skill?: Database["public"]["Enums"]["cooking_skill"];
+          daily_kcal_target?: number | null;
+          diet?: Database["public"]["Enums"]["diet"];
+          disliked_ingredients?: string[];
+          max_prep_minutes?: number | null;
           meal_types?: Database["public"]["Enums"]["meal_type"][];
           servings?: number;
           updated_at?: string;
           user_id: string;
+          weekly_budget_czk?: number | null;
         };
         Update: {
+          allergens?: Database["public"]["Enums"]["allergen"][];
           appliances?: Database["public"]["Enums"]["appliance"][];
           categories?: Database["public"]["Enums"]["category"][];
+          cooking_skill?: Database["public"]["Enums"]["cooking_skill"];
+          daily_kcal_target?: number | null;
+          diet?: Database["public"]["Enums"]["diet"];
+          disliked_ingredients?: string[];
+          max_prep_minutes?: number | null;
           meal_types?: Database["public"]["Enums"]["meal_type"][];
           servings?: number;
           updated_at?: string;
           user_id?: string;
+          weekly_budget_czk?: number | null;
         };
         Relationships: [
           {
@@ -262,9 +283,23 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
+      allergen:
+        | "GLUTEN"
+        | "LACTOSE"
+        | "EGGS"
+        | "NUTS"
+        | "PEANUTS"
+        | "FISH"
+        | "SHELLFISH"
+        | "SOY"
+        | "SESAME"
+        | "CELERY"
+        | "MUSTARD";
       appliance: "STOVE" | "OVEN" | "MICROWAVE" | "AIR_FRYER" | "BLENDER";
       category:
         "QUICK" | "HIGH_PROTEIN" | "CZECH_CLASSIC" | "VEGETARIAN" | "BUDGET";
+      cooking_skill: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+      diet: "OMNIVORE" | "VEGETARIAN" | "VEGAN" | "PESCATARIAN";
       meal_type: "BREAKFAST" | "LUNCH" | "DINNER";
       unit: "G" | "ML" | "PCS";
     };
@@ -394,6 +429,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      allergen: [
+        "GLUTEN",
+        "LACTOSE",
+        "EGGS",
+        "NUTS",
+        "PEANUTS",
+        "FISH",
+        "SHELLFISH",
+        "SOY",
+        "SESAME",
+        "CELERY",
+        "MUSTARD",
+      ],
       appliance: ["STOVE", "OVEN", "MICROWAVE", "AIR_FRYER", "BLENDER"],
       category: [
         "QUICK",
@@ -402,6 +450,8 @@ export const Constants = {
         "VEGETARIAN",
         "BUDGET",
       ],
+      cooking_skill: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
+      diet: ["OMNIVORE", "VEGETARIAN", "VEGAN", "PESCATARIAN"],
       meal_type: ["BREAKFAST", "LUNCH", "DINNER"],
       unit: ["G", "ML", "PCS"],
     },

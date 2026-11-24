@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import { getMyPreferences } from "@/lib/data/preferences";
 import { getMyProfile } from "@/lib/data/profiles";
 
 const FEATURES = [
@@ -29,14 +30,27 @@ async function UserSection() {
     );
   }
 
+  const preferences = await getMyPreferences("/");
+
   return (
     <div className="flex flex-col items-start gap-2">
       <p className="text-lg font-medium">
         Welcome back, {profile.name ?? profile.email}!
       </p>
-      <Link href="/plans" className={buttonVariants({ size: "lg" })}>
-        Open your meal plans
-      </Link>
+      {preferences ? (
+        <Link href="/plans" className={buttonVariants({ size: "lg" })}>
+          Open your meal plans
+        </Link>
+      ) : (
+        <>
+          <p className="text-muted-foreground">
+            First, tell us what you like to eat.
+          </p>
+          <Link href="/onboarding" className={buttonVariants({ size: "lg" })}>
+            Set up your preferences
+          </Link>
+        </>
+      )}
     </div>
   );
 }

@@ -38,6 +38,9 @@ const DEMO_USERS: {
       categories: ["CZECH_CLASSIC", "HIGH_PROTEIN"],
       appliances: ["STOVE", "OVEN"],
       servings: 2,
+      cooking_skill: "INTERMEDIATE",
+      disliked_ingredients: ["mushrooms"],
+      daily_kcal_target: 2500,
     },
   },
   {
@@ -48,6 +51,10 @@ const DEMO_USERS: {
       categories: ["VEGETARIAN", "QUICK", "BUDGET"],
       appliances: ["STOVE", "MICROWAVE", "BLENDER"],
       servings: 1,
+      diet: "VEGETARIAN",
+      allergens: ["LACTOSE"],
+      max_prep_minutes: 30,
+      weekly_budget_czk: 1200,
     },
   },
 ];
