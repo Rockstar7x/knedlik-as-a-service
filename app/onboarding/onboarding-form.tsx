@@ -23,7 +23,7 @@ import {
   COOKING_SKILL_LABELS,
   DIET_LABELS,
   MEAL_TYPE_LABELS,
-} from "@/lib/preferences-labels";
+} from "@/lib/labels";
 import {
   MAX_CATEGORIES,
   MAX_DISLIKED_INGREDIENTS,
@@ -31,12 +31,6 @@ import {
 } from "@/lib/validation/preferences";
 
 const initialState: PreferencesFormState = {};
-
-// Diet is its own question now, so the VEGETARIAN category would duplicate it.
-// The enum value stays in the database for existing rows.
-const FORM_CATEGORY_LABELS = Object.fromEntries(
-  Object.entries(CATEGORY_LABELS).filter(([value]) => value !== "VEGETARIAN"),
-);
 
 type ChoiceGroupProps = {
   name: string;
@@ -196,7 +190,7 @@ export function OnboardingForm({
             name="categories"
             legend="Preferred categories"
             hint={`Optional, at most ${MAX_CATEGORIES}.`}
-            options={FORM_CATEGORY_LABELS}
+            options={CATEGORY_LABELS}
             checked={values.categories}
             errors={errors?.categories}
           />

@@ -7,7 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MEAL_TYPE_LABELS, type MealType } from "@/lib/meals";
+import { MEAL_TYPE_LABELS } from "@/lib/labels";
+import { type MealType } from "@/lib/meals";
 
 type MealCardProps = {
   mealType?: MealType;

@@ -8,8 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MEAL_TYPE_LABELS } from "@/lib/meals";
-import { findMockMeal } from "@/lib/mock/recipes";
+import { getMyMeal } from "@/lib/data/meals";
+import { CATEGORY_LABELS, MEAL_TYPE_LABELS } from "@/lib/labels";
+import { formatQuantity } from "@/lib/meals";
 import { formatDay } from "@/lib/week";
 
 type RecipePageProps = PageProps<"/plans/[id]/meals/[mealId]">;
@@ -17,20 +18,18 @@ type RecipePageProps = PageProps<"/plans/[id]/meals/[mealId]">;
 export async function generateMetadata({
   params,
 }: RecipePageProps): Promise<Metadata> {
-  const { mealId } = await params;
-  const found = findMockMeal(mealId);
-  return { title: found?.meal.name ?? "Recipe" };
+  const { id, mealId } = await params;
+  const meal = await getMyMeal(id, mealId);
+  return { title: meal?.name ?? "Recipe" };
 }
 
 async function Recipe({ params }: { params: RecipePageProps["params"] }) {
   const { id, mealId } = await params;
-  const found = findMockMeal(mealId);
+  const meal = await getMyMeal(id, mealId);
 
-  if (!found) {
+  if (!meal) {
     notFound();
   }
-
-  const { meal, recipe } = found;
 
   return (
     <>
@@ -41,7 +40,7 @@ async function Recipe({ params }: { params: RecipePageProps["params"] }) {
         >
           ← Back to plan
         </Link>
-        <Badge variant="secondary">{meal.category}</Badge>
+        <Badge variant="secondary">{CATEGORY_LABELS[meal.category]}</Badge>
         <h1 className="text-2xl font-semibold">{meal.name}</h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
           <span>
@@ -75,47 +74,41 @@ async function Recipe({ params }: { params: RecipePageProps["params"] }) {
         </CardContent>
       </Card>
 
-      {recipe ? (
-        <div className="grid gap-8 md:grid-cols-[2fr_3fr]">
-          <section className="grid content-start gap-2">
-            <h2 className="text-lg font-semibold">Ingredients</h2>
-            <p className="text-sm text-muted-foreground">
-              For {meal.servings} {meal.servings === 1 ? "serving" : "servings"}
-            </p>
-            <ul className="divide-y">
-              {recipe.ingredients.map((ingredient) => (
-                <li
-                  key={ingredient.name}
-                  className="flex items-center justify-between gap-4 py-2.5"
-                >
-                  <span className="min-w-0 break-words">{ingredient.name}</span>
-                  <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
-                    {ingredient.quantity} {ingredient.unit}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
+      <div className="grid gap-8 md:grid-cols-[2fr_3fr]">
+        <section className="grid content-start gap-2">
+          <h2 className="text-lg font-semibold">Ingredients</h2>
+          <p className="text-sm text-muted-foreground">
+            For {meal.servings} {meal.servings === 1 ? "serving" : "servings"}
+          </p>
+          <ul className="divide-y">
+            {meal.ingredients.map((ingredient) => (
+              <li
+                key={ingredient.id}
+                className="flex items-center justify-between gap-4 py-2.5"
+              >
+                <span className="min-w-0 break-words">{ingredient.name}</span>
+                <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
+                  {formatQuantity(ingredient.quantity, ingredient.unit)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-          <section className="grid content-start gap-4">
-            <h2 className="text-lg font-semibold">Steps</h2>
-            <ol className="grid gap-4">
-              {recipe.steps.map((step, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-medium text-secondary-foreground">
-                    {index + 1}
-                  </span>
-                  <p className="pt-0.5 leading-relaxed">{step}</p>
-                </li>
-              ))}
-            </ol>
-          </section>
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          Ingredients and steps for this meal are not available yet.
-        </p>
-      )}
+        <section className="grid content-start gap-4">
+          <h2 className="text-lg font-semibold">Steps</h2>
+          <ol className="grid gap-4">
+            {meal.steps.map((step, index) => (
+              <li key={index} className="flex gap-3">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-medium text-secondary-foreground">
+                  {index + 1}
+                </span>
+                <p className="pt-0.5 leading-relaxed">{step}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
     </>
   );
 }

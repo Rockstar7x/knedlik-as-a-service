@@ -48,28 +48,58 @@ export type Database = {
       };
       meal_plans: {
         Row: {
+          allergens: Database["public"]["Enums"]["allergen"][];
+          appliances: Database["public"]["Enums"]["appliance"][];
+          categories: Database["public"]["Enums"]["category"][];
+          cooking_skill: Database["public"]["Enums"]["cooking_skill"];
           created_at: string;
+          daily_kcal_target: number | null;
+          diet: Database["public"]["Enums"]["diet"];
+          disliked_ingredients: string[];
           id: string;
+          max_prep_minutes: number | null;
+          meal_types: Database["public"]["Enums"]["meal_type"][];
           note: string | null;
           servings: number;
           user_id: string;
           week_start: string;
+          weekly_budget_czk: number | null;
         };
         Insert: {
+          allergens: Database["public"]["Enums"]["allergen"][];
+          appliances: Database["public"]["Enums"]["appliance"][];
+          categories: Database["public"]["Enums"]["category"][];
+          cooking_skill: Database["public"]["Enums"]["cooking_skill"];
           created_at?: string;
+          daily_kcal_target?: number | null;
+          diet: Database["public"]["Enums"]["diet"];
+          disliked_ingredients: string[];
           id?: string;
+          max_prep_minutes?: number | null;
+          meal_types: Database["public"]["Enums"]["meal_type"][];
           note?: string | null;
-          servings?: number;
+          servings: number;
           user_id: string;
           week_start: string;
+          weekly_budget_czk?: number | null;
         };
         Update: {
+          allergens?: Database["public"]["Enums"]["allergen"][];
+          appliances?: Database["public"]["Enums"]["appliance"][];
+          categories?: Database["public"]["Enums"]["category"][];
+          cooking_skill?: Database["public"]["Enums"]["cooking_skill"];
           created_at?: string;
+          daily_kcal_target?: number | null;
+          diet?: Database["public"]["Enums"]["diet"];
+          disliked_ingredients?: string[];
           id?: string;
+          max_prep_minutes?: number | null;
+          meal_types?: Database["public"]["Enums"]["meal_type"][];
           note?: string | null;
           servings?: number;
           user_id?: string;
           week_start?: string;
+          weekly_budget_czk?: number | null;
         };
         Relationships: [
           {
@@ -113,6 +143,7 @@ export type Database = {
       meals: {
         Row: {
           carbs_g: number;
+          category: Database["public"]["Enums"]["category"];
           date: string;
           fat_g: number;
           id: string;
@@ -125,6 +156,7 @@ export type Database = {
         };
         Insert: {
           carbs_g?: number;
+          category: Database["public"]["Enums"]["category"];
           date: string;
           fat_g?: number;
           id?: string;
@@ -137,6 +169,7 @@ export type Database = {
         };
         Update: {
           carbs_g?: number;
+          category?: Database["public"]["Enums"]["category"];
           date?: string;
           fat_g?: number;
           id?: string;
@@ -239,8 +272,7 @@ export type Database = {
       };
       shopping_items: {
         Row: {
-          bought: boolean;
-          have: boolean;
+          checked: boolean;
           id: string;
           name: string;
           plan_id: string;
@@ -248,8 +280,7 @@ export type Database = {
           unit: Database["public"]["Enums"]["unit"];
         };
         Insert: {
-          bought?: boolean;
-          have?: boolean;
+          checked?: boolean;
           id?: string;
           name: string;
           plan_id: string;
@@ -257,8 +288,7 @@ export type Database = {
           unit: Database["public"]["Enums"]["unit"];
         };
         Update: {
-          bought?: boolean;
-          have?: boolean;
+          checked?: boolean;
           id?: string;
           name?: string;
           plan_id?: string;
@@ -295,9 +325,16 @@ export type Database = {
         | "SESAME"
         | "CELERY"
         | "MUSTARD";
-      appliance: "STOVE" | "OVEN" | "MICROWAVE" | "AIR_FRYER" | "BLENDER";
+      appliance: "STOVE" | "OVEN" | "MICROWAVE" | "AIR_FRYER";
       category:
-        "QUICK" | "HIGH_PROTEIN" | "CZECH_CLASSIC" | "VEGETARIAN" | "BUDGET";
+        | "QUICK"
+        | "LOW_CALORIE"
+        | "FAMILY_CLASSIC"
+        | "HEALTHY_COMFORT"
+        | "FAKEAWAY"
+        | "EASY_TO_DIGEST"
+        | "HIGH_PROTEIN"
+        | "CZECH_CLASSIC";
       cooking_skill: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
       diet: "OMNIVORE" | "VEGETARIAN" | "VEGAN" | "PESCATARIAN";
       meal_type: "BREAKFAST" | "LUNCH" | "DINNER";
@@ -442,13 +479,16 @@ export const Constants = {
         "CELERY",
         "MUSTARD",
       ],
-      appliance: ["STOVE", "OVEN", "MICROWAVE", "AIR_FRYER", "BLENDER"],
+      appliance: ["STOVE", "OVEN", "MICROWAVE", "AIR_FRYER"],
       category: [
         "QUICK",
+        "LOW_CALORIE",
+        "FAMILY_CLASSIC",
+        "HEALTHY_COMFORT",
+        "FAKEAWAY",
+        "EASY_TO_DIGEST",
         "HIGH_PROTEIN",
         "CZECH_CLASSIC",
-        "VEGETARIAN",
-        "BUDGET",
       ],
       cooking_skill: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
       diet: ["OMNIVORE", "VEGETARIAN", "VEGAN", "PESCATARIAN"],

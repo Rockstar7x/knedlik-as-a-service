@@ -1,5 +1,6 @@
 import { MacroBar } from "@/components/macro-bar";
 import { MealCard } from "@/components/meal-card";
+import { CATEGORY_LABELS } from "@/lib/labels";
 import { type Meal } from "@/lib/meals";
 import { formatDay } from "@/lib/week";
 
@@ -41,7 +42,7 @@ export function DayPlan({ date, meals, planId }: DayPlanProps) {
             key={meal.id}
             mealType={meal.mealType}
             name={meal.name}
-            category={meal.category}
+            category={CATEGORY_LABELS[meal.category]}
             preparationTime={meal.preparationTime}
             servings={meal.servings}
             kcal={meal.kcal}

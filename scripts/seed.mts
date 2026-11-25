@@ -5,6 +5,7 @@ import {
 import type {
   Database,
   Enums,
+  Tables,
   TablesInsert,
 } from "../lib/supabase/database.types";
 
@@ -25,10 +26,13 @@ const supabase = createClient<Database>(url, secretKey, {
 
 const DEMO_PASSWORD = "knedlik123";
 
+/** Saved to the profile and copied to the plan as its preferences snapshot. */
+type DemoPreferences = Omit<Tables<"preferences">, "user_id" | "updated_at">;
+
 const DEMO_USERS: {
   email: string;
   name: string;
-  preferences: Omit<TablesInsert<"preferences">, "user_id">;
+  preferences: DemoPreferences;
 }[] = [
   {
     email: "joe@knedlik.test",
@@ -38,9 +42,13 @@ const DEMO_USERS: {
       categories: ["CZECH_CLASSIC", "HIGH_PROTEIN"],
       appliances: ["STOVE", "OVEN"],
       servings: 2,
-      cooking_skill: "INTERMEDIATE",
+      diet: "OMNIVORE",
+      allergens: [],
       disliked_ingredients: ["mushrooms"],
+      max_prep_minutes: null,
       daily_kcal_target: 2500,
+      cooking_skill: "INTERMEDIATE",
+      weekly_budget_czk: null,
     },
   },
   {
@@ -48,12 +56,16 @@ const DEMO_USERS: {
     name: "Jane Doe",
     preferences: {
       meal_types: ["BREAKFAST", "LUNCH", "DINNER"],
-      categories: ["VEGETARIAN", "QUICK", "BUDGET"],
-      appliances: ["STOVE", "MICROWAVE", "BLENDER"],
+      categories: ["QUICK", "EASY_TO_DIGEST", "HEALTHY_COMFORT"],
+      appliances: ["STOVE", "MICROWAVE", "AIR_FRYER"],
       servings: 1,
       diet: "VEGETARIAN",
-      allergens: ["LACTOSE"],
+      // None of the recipes below contain peanuts, so the plan respects it.
+      allergens: ["PEANUTS"],
+      disliked_ingredients: [],
       max_prep_minutes: 30,
+      daily_kcal_target: null,
+      cooking_skill: "BEGINNER",
       weekly_budget_czk: 1200,
     },
   },
@@ -62,6 +74,7 @@ const DEMO_USERS: {
 type Recipe = {
   name: string;
   mealType: Enums<"meal_type">;
+  category: Enums<"category">;
   vegetarian: boolean;
   prepMinutes: number;
   kcal: number;
@@ -77,6 +90,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Oatmeal with banana",
     mealType: "BREAKFAST",
+    category: "EASY_TO_DIGEST",
     vegetarian: true,
     prepMinutes: 10,
     kcal: 380,
@@ -97,6 +111,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Scrambled eggs with bread",
     mealType: "BREAKFAST",
+    category: "QUICK",
     vegetarian: true,
     prepMinutes: 10,
     kcal: 420,
@@ -117,6 +132,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Beef sirloin in cream sauce with dumplings",
     mealType: "LUNCH",
+    category: "CZECH_CLASSIC",
     vegetarian: false,
     prepMinutes: 180,
     kcal: 850,
@@ -140,6 +156,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Beef goulash with bread",
     mealType: "LUNCH",
+    category: "CZECH_CLASSIC",
     vegetarian: false,
     prepMinutes: 120,
     kcal: 720,
@@ -162,6 +179,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Fried cheese with fries",
     mealType: "LUNCH",
+    category: "FAKEAWAY",
     vegetarian: true,
     prepMinutes: 25,
     kcal: 900,
@@ -183,6 +201,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Sour lentils with a fried egg",
     mealType: "DINNER",
+    category: "HEALTHY_COMFORT",
     vegetarian: true,
     prepMinutes: 40,
     kcal: 540,
@@ -205,6 +224,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Chicken breast with rice",
     mealType: "DINNER",
+    category: "HIGH_PROTEIN",
     vegetarian: false,
     prepMinutes: 30,
     kcal: 560,
@@ -225,6 +245,7 @@ const RECIPES: Recipe[] = [
   {
     name: "Potato pancakes",
     mealType: "DINNER",
+    category: "FAMILY_CLASSIC",
     vegetarian: true,
     prepMinutes: 35,
     kcal: 610,
@@ -312,9 +333,10 @@ async function seedUser(demo: (typeof DEMO_USERS)[number]) {
     "insert preferences",
   );
 
-  const servings = demo.preferences.servings ?? 2;
-  const vegetarianOnly = demo.preferences.categories?.includes("VEGETARIAN");
-  const mealTypes = demo.preferences.meal_types ?? ["LUNCH", "DINNER"];
+  const { servings, meal_types: mealTypes, diet } = demo.preferences;
+  // The demo recipes are tagged only as vegetarian or not, which covers the
+  // diets of the demo users. Other preferences do not filter them.
+  const vegetarianOnly = diet === "VEGETARIAN";
   const weekStart = currentMonday();
 
   const plan = must(
@@ -323,8 +345,8 @@ async function seedUser(demo: (typeof DEMO_USERS)[number]) {
       .insert({
         user_id: userId,
         week_start: isoDate(weekStart),
-        servings,
         note: "Sample meal plan from the seed script",
+        ...demo.preferences,
       })
       .select()
       .single(),
@@ -354,6 +376,7 @@ async function seedUser(demo: (typeof DEMO_USERS)[number]) {
           plan_id: plan.id,
           date,
           meal_type: recipe.mealType,
+          category: recipe.category,
           name: recipe.name,
           prep_minutes: recipe.prepMinutes,
           kcal: recipe.kcal,
@@ -397,8 +420,7 @@ async function seedUser(demo: (typeof DEMO_USERS)[number]) {
           unit: ing.unit,
           // Bulk inserts send NULL (not the column default) for keys that are
           // missing from some rows, so every row must set the same keys.
-          have: false,
-          bought: false,
+          checked: false,
         });
       }
     }
@@ -414,9 +436,8 @@ async function seedUser(demo: (typeof DEMO_USERS)[number]) {
   );
 
   const shoppingItems = [...shopping.values()];
-  // Mark a couple of items as already at home / bought, for UI testing.
-  if (shoppingItems[0]) shoppingItems[0].have = true;
-  if (shoppingItems[1]) shoppingItems[1].bought = true;
+  // Check a couple of items, for UI testing.
+  for (const item of shoppingItems.slice(0, 2)) item.checked = true;
   must(
     await supabase.from("shopping_items").insert(shoppingItems).select("id"),
     "insert shopping items",
